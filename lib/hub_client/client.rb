@@ -1,6 +1,6 @@
 class HubClient::Client
-  def initialize
-    @config = HubClient::Config.new
+  def initialize options
+    @config = HubClient::Config.new options
   end
 
   def notify connector, event, data
