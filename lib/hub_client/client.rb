@@ -6,7 +6,7 @@ class HubClient::Client
   end
 
   def notify connector, event, data
-    RestClient.post "#{@config.url}/#{connector}/#{event}?token=#{@config.token}", data
+    RestClient.post "#{@config.url}/#{connector}/#{event}?token=#{@config.token}", data, content_type: 'application/json'
   end
 
   def url
