@@ -1,4 +1,5 @@
 require "guisso/api"
+require_relative "./entity_set"
 
 class HubClient::Api < Guisso::Api
   # TODO refactor so default_host is a url with protocol
@@ -13,5 +14,9 @@ class HubClient::Api < Guisso::Api
 
   def self.default_use_ssl
     URI(HubClient.current.url).scheme == 'https'
+  end
+
+  def entity_set(path)
+    HubClient::EntitySet.new(self, path)
   end
 end
