@@ -48,6 +48,8 @@ class PickerResult
       .css('position', 'absolute')
       .css('left', @container.width() * .1)
       .css('top', @container.height() * .1)
+      .css('background-color', 'white')
+      .css('border', '0')
     @container.append(iframe)
 
     @pickerWin = iframe[0].contentWindow
