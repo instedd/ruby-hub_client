@@ -34,7 +34,7 @@ class HubApi
 
 class PickerResult
   constructor: (@api) ->
-    @id = Date.now()
+    @id = new Date().getTime()
 
   show: (type) ->
     @container = $('<div>')
