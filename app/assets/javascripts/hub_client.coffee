@@ -12,7 +12,7 @@ class HubApi
 
 
   openPicker: (type) ->
-    valid_types = ['entityset', 'action', 'event']
+    valid_types = ['entity_set', 'action', 'event']
     console.error("called HubApi\#openPicker(type) with type=#{type}. valid values: #{valid_types.join(', ')}.") if $.inArray(type, valid_types) == -1
 
     pr = new PickerResult(@)
@@ -24,8 +24,13 @@ class HubApi
     @url
 
   _message: (event) ->
+    return if $.isEmptyObject(@pickers)
     data = JSON.parse(event.data)
-    @pickers[data.target][data.message](data)
+    target = @pickers[data.target]
+    target[data.message](data) if target
+
+  _removePicker: (pr) ->
+    delete @pickers[pr.id]
 
 class PickerResult
   constructor: (@api) ->
@@ -73,6 +78,7 @@ class PickerResult
 
   close: ->
     @container.remove()
+    @api._removePicker(@)
 
   then: (callback) ->
     @then = callback
