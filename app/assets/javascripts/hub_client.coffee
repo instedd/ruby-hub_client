@@ -12,8 +12,11 @@ class HubApi
 
 
   openPicker: (type) ->
+    valid_types = ['entityset', 'action', 'event']
+    console.error("called HubApi\#openPicker(type) with type=#{type}. valid values: #{valid_types.join(', ')}.") if $.inArray(type, valid_types) == -1
+
     pr = new PickerResult(@)
-    pr.show()
+    pr.show(type)
     @pickers[pr.id] = pr
     pr
 
@@ -28,7 +31,7 @@ class PickerResult
   constructor: (@api) ->
     @id = Date.now()
 
-  show: ->
+  show: (type) ->
     @container = $('<div>')
       .css('position', 'fixed')
       .css('left', 0).css('right', 0).css('top', 0).css('bottom', 0).css('z-index', 1040)
@@ -44,7 +47,7 @@ class PickerResult
     $('body').append(@container)
 
     iframe = $("<iframe>").width(@container.width() * 0.8).height(@container.height() * 0.8)
-      .attr('src', "#{@api.url}/api/picker")
+      .attr('src', "#{@api.url}/api/picker?#{$.param(type: type)}")
       .css('position', 'absolute')
       .css('left', @container.width() * .1)
       .css('top', @container.height() * .1)
