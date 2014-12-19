@@ -1,5 +1,7 @@
 class HubApi
-  constructor: (@url) ->
+  # url: hub host url (example: 'http://hub.instedd.org')
+  # proxy_pi: url to use for calling hub api on behalf current user: (example: '/hub' if that redirects to 'http://hub.instedd.org/api')
+  constructor: (@url, @proxyApi = "#{url}/api") ->
     @pickers = {}
 
     if window.addEventListener
@@ -20,8 +22,11 @@ class HubApi
     @pickers[pr.id] = pr
     pr
 
-  url: ->
-    @url
+  reflect: (path) ->
+    new ReflectPromise(@, path)
+
+  reflectResult: (json) ->
+    ReflectResult.fromJson(json)
 
   _message: (event) ->
     return if $.isEmptyObject(@pickers)
@@ -31,6 +36,84 @@ class HubApi
 
   _removePicker: (pr) ->
     delete @pickers[pr.id]
+
+class ReflectPromise
+  constructor: (@api, @path) ->
+    @result = null
+    $.getJSON "#{@api.proxyApi}/reflect/#{path}", (data) =>
+      @result = new ReflectResult(data)
+      @_performPromise()
+
+  # callback: function(data) { ... }
+  then: (callback) ->
+    @callback = callback
+    @_performPromise()
+
+  _performPromise: ->
+    @callback(@result) if @result and @result
+
+
+class MemberField
+  constructor: (@_parent, @_name, @_type) ->
+  name: ->
+    @_name
+  type: ->
+    @_type
+  isStruct: ->
+    @_type == 'struct'
+  path: ->
+    (if @_parent then @_parent.path() else []).concat(@_name)
+
+class ValueMemberField extends MemberField
+  constructor: (parent, name, type) ->
+    super(parent, name, type)
+  visit: (callback) ->
+    callback(@)
+
+class StructMemberField extends MemberField
+  constructor: (parent, name, @_isOpen) ->
+    super(parent, name, 'struct')
+    @_fields = [] # Array of MemberField
+  fields: ->
+    @_fields
+  isOpen: ->
+    @_isOpen
+  visit: (callback) ->
+    res = {}
+    for field in @fields()
+      res[field.name()] = field.visit(callback)
+    res
+
+class ReflectResult
+  constructor: (@_data) ->
+    @_args = []
+    @_appendFields(null, @_args, @_data.args)
+  label: ->
+    @_data.label
+  args: ->
+    @_args
+  visitArgs: (callback) ->
+    res = {}
+    for field in @args()
+      res[field.name()] = field.visit(callback)
+    res
+
+  toJson: ->
+    @_data
+  @fromJson: (json) ->
+    new ReflectResult(json)
+
+  _buildMemberField: (parent, name, def) ->
+    type = def.type?.kind || def.type
+    if type == 'struct'
+      res = new StructMemberField(parent, name, def.type.open)
+      @_appendFields(res, res.fields(), def.type.members)
+      res
+    else
+      new ValueMemberField(parent, name, type)
+  _appendFields: (parent, target, members) ->
+    for name, def of members
+      target.push @_buildMemberField(parent, name, def)
 
 class PickerResult
   constructor: (@api) ->
