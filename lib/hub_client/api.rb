@@ -1,5 +1,6 @@
 require "guisso/api"
 require_relative "./entity_set"
+require_relative "./action"
 
 class HubClient::Api < Guisso::Api
   # TODO refactor so default_host is a url with protocol
@@ -18,5 +19,9 @@ class HubClient::Api < Guisso::Api
 
   def entity_set(path)
     HubClient::EntitySet.new(self, path)
+  end
+
+  def action(path)
+    HubClient::Action.new(self, path)
   end
 end
