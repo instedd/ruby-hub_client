@@ -54,7 +54,7 @@ class ReflectPromise
 
 
 class MemberField
-  constructor: (@_parent, @_name, @_type, @_def) ->
+  constructor: (@_parent, @_name, @_def) ->
   name: ->
     @_name
   label: ->
@@ -62,21 +62,21 @@ class MemberField
   _jsonDef: ->
     @_def
   type: ->
-    @_type
+    @_def.type?.kind || @_def.type
   isStruct: ->
-    @_type == 'struct'
+    @type() == 'struct'
   path: ->
     (if @_parent then @_parent.path() else []).concat(@_name)
 
 class ValueMemberField extends MemberField
-  constructor: (parent, name, type, def) ->
-    super(parent, name, type, def)
+  constructor: (parent, name, def) ->
+    super(parent, name, def)
   visit: (callback) ->
     callback(@)
 
 class StructMemberField extends MemberField
   constructor: (parent, name, def) ->
-    super(parent, name, 'struct', def)
+    super(parent, name, def)
     @_fields = [] # Array of MemberField
   fields: ->
     @_fields
@@ -138,7 +138,7 @@ class ReflectResult
       @_appendFields(res, res.fields(), def.type.members, def)
       res
     else
-      new ValueMemberField(parent, name, type, def)
+      new ValueMemberField(parent, name, def)
   _appendFields: (parent, target, members) ->
     for name, def of members
       target.push @_buildMemberField(parent, name, def)
