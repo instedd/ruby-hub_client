@@ -59,6 +59,8 @@ class MemberField
     @_name
   label: ->
     @_def.label || @name()
+  _jsonDef: ->
+    @_def
   type: ->
     @_type
   isStruct: ->
@@ -86,6 +88,26 @@ class StructMemberField extends MemberField
       res[field.name()] = field.visit(callback)
     res
 
+  addOpenField: (name, type) ->
+    console.error 'operation not support for non-open structs' unless @isOpen()
+    new_field = if type == 'struct'
+      new StructMemberField(@, name, {type: {kind: 'struct', open: true}})
+    else
+      new ValueMemberField(@, name, type, {type: type})
+
+    @fields().push(new_field)
+
+    new_field
+
+  _jsonDef: ->
+    res = super
+    if @isOpen()
+      # update members if the struct is open
+      res.type.members = {}
+      for f in @fields()
+        res.type.members[f.name()] = f._jsonDef()
+    res
+
 class ReflectResult
   constructor: (@_data) ->
     @_args = []
@@ -101,7 +123,11 @@ class ReflectResult
     res
 
   toJson: ->
+    # update args in case they were changed
+    for arg in @args()
+      @_data.args[arg.name()] = arg._jsonDef()
     @_data
+
   @fromJson: (json) ->
     new ReflectResult(json)
 
