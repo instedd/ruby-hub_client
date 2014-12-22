@@ -54,9 +54,11 @@ class ReflectPromise
 
 
 class MemberField
-  constructor: (@_parent, @_name, @_type) ->
+  constructor: (@_parent, @_name, @_type, @_def) ->
   name: ->
     @_name
+  label: ->
+    @_def.label || @name()
   type: ->
     @_type
   isStruct: ->
@@ -65,19 +67,19 @@ class MemberField
     (if @_parent then @_parent.path() else []).concat(@_name)
 
 class ValueMemberField extends MemberField
-  constructor: (parent, name, type) ->
-    super(parent, name, type)
+  constructor: (parent, name, type, def) ->
+    super(parent, name, type, def)
   visit: (callback) ->
     callback(@)
 
 class StructMemberField extends MemberField
-  constructor: (parent, name, @_isOpen) ->
-    super(parent, name, 'struct')
+  constructor: (parent, name, def) ->
+    super(parent, name, 'struct', def)
     @_fields = [] # Array of MemberField
   fields: ->
     @_fields
   isOpen: ->
-    @_isOpen
+    @_def.type.open
   visit: (callback) ->
     res = {}
     for field in @fields()
@@ -106,11 +108,11 @@ class ReflectResult
   _buildMemberField: (parent, name, def) ->
     type = def.type?.kind || def.type
     if type == 'struct'
-      res = new StructMemberField(parent, name, def.type.open)
-      @_appendFields(res, res.fields(), def.type.members)
+      res = new StructMemberField(parent, name, def)
+      @_appendFields(res, res.fields(), def.type.members, def)
       res
     else
-      new ValueMemberField(parent, name, type)
+      new ValueMemberField(parent, name, type, def)
   _appendFields: (parent, target, members) ->
     for name, def of members
       target.push @_buildMemberField(parent, name, def)
