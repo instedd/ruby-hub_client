@@ -68,6 +68,13 @@ class MemberField
   path: ->
     (if @_parent then @_parent.path() else []).concat(@_name)
 
+  canBeRemoved: ->
+    @_parent && @_parent.isStruct() && @_parent.isOpen()
+
+  remove: ->
+    console.error 'not supported' unless @_parent && @_parent.isStruct()
+    @_parent.removeField(@name())
+
 class ValueMemberField extends MemberField
   constructor: (parent, name, def) ->
     super(parent, name, def)
@@ -98,6 +105,11 @@ class StructMemberField extends MemberField
     @fields().push(new_field)
 
     new_field
+
+  removeField: (name) ->
+    console.error 'not supported' unless @_parent.isOpen()
+    index = i for f, i in @_fields when f.name() == name
+    @_fields.splice(index, 1)
 
   _jsonDef: ->
     res = super
