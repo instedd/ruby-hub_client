@@ -157,7 +157,7 @@ class PickerResult
 
   selected: (event) ->
     @close()
-    @then(event.path)
+    @then(event.path, event.selection)
 
   close: ->
     @container.remove()
