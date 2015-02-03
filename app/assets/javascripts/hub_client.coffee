@@ -78,6 +78,10 @@ class MemberField
 class ValueMemberField extends MemberField
   constructor: (parent, name, def) ->
     super(parent, name, def)
+  isEnum: ->
+    @type() == 'enum'
+  enumOptions: ->
+    @_def.type?.members || []
   visit: (callback) ->
     callback(@)
 
