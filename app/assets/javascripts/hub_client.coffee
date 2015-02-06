@@ -100,7 +100,7 @@ class StructMemberField extends MemberField
     res
 
   addOpenField: (name, type) ->
-    console.error 'operation not support for non-open structs' unless @isOpen()
+    throw 'operation not support for non-open structs' unless @isOpen()
     new_field = if type == 'struct'
       new StructMemberField(@, name, {type: {kind: 'struct', open: true}})
     else
@@ -111,7 +111,7 @@ class StructMemberField extends MemberField
     new_field
 
   removeField: (name) ->
-    console.error 'not supported' unless @_parent.isOpen()
+    throw 'not supported' unless @isOpen()
     index = i for f, i in @_fields when f.name() == name
     @_fields.splice(index, 1)
 
