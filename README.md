@@ -7,16 +7,12 @@ TODO: Write a gem description
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'hub_client'
+gem 'hub_client', github: 'instedd/ruby-hub_client', branch: 'master'
 ```
 
 And then execute:
 
     $ bundle
-
-Or install it yourself as:
-
-    $ gem install hub_client
 
 ## Usage
 
