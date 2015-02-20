@@ -40,7 +40,7 @@ class HubApi
 class ReflectPromise
   constructor: (@api, @path) ->
     @result = null
-    $.getJSON "#{@api.proxyApi}/reflect/#{path}", (data) =>
+    $.getJSON "#{@api.proxyApi}/reflect/#{@path}", (data) =>
       @result = new ReflectResult(data)
       @_performPromise()
 
