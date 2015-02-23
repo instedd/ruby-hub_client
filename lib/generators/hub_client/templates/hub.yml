@@ -1,0 +1,4 @@
+enabled: true
+url: http://hub-stg.instedd.org/
+connector_guid: CONNECTOR-GUID
+token: SECRET-TOKEN
