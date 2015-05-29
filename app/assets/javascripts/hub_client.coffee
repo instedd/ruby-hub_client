@@ -1,7 +1,7 @@
 class HubApi
   # url: hub host url (example: 'http://hub.instedd.org')
   # proxy_pi: url to use for calling hub api on behalf current user: (example: '/hub' if that redirects to 'http://hub.instedd.org/api')
-  constructor: (@url, @proxyApi = "#{url}/api") ->
+  constructor: (@url, @proxyApi = "#{@url}/api") ->
     @pickers = {}
 
     if window.addEventListener
