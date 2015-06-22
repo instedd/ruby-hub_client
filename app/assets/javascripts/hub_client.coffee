@@ -127,14 +127,23 @@ class StructMemberField extends MemberField
 class ReflectResult
   constructor: (@_data) ->
     @_args = []
+    @_entity_definition = []
     @_appendFields(null, @_args, @_data.args)
+    @_appendFields(null, @_entity_definition, @_data?.entity_definition?.properties || {})
   label: ->
     @_data.label
   args: ->
     @_args
+  entityDefinition: ->
+    @_entity_definition
   visitArgs: (callback) ->
     res = {}
     for field in @args()
+      res[field.name()] = field.visit(callback)
+    res
+  visitEntity: (callback) ->
+    res = {}
+    for field in @entityDefinition()
       res[field.name()] = field.visit(callback)
     res
 
