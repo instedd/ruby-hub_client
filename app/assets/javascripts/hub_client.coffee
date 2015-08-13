@@ -57,6 +57,8 @@ class MemberField
   constructor: (@_parent, @_name, @_def) ->
   name: ->
     @_name
+  setName: (value) ->
+    @_name = value
   label: ->
     @_def.label || @name()
   _jsonDef: ->
