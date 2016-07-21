@@ -3,7 +3,7 @@ class HubClient::Config
 
   def initialize options
     # Prefer the `config` gem if available and a "hub" section exists
-    if defined?(::Settings) && (hub = Settings.hub)
+    if defined?(::Settings) && (hub = ::Settings.hub)
       config = hub.to_h
     else
       config = YAML.load_file("#{Rails.root}/config/hub.yml") rescue {}
