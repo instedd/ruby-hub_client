@@ -6,7 +6,7 @@ class HubClient::Api < Guisso::Api
   # TODO refactor so default_host is a url with protocol
   def self.default_host
     uri = URI(HubClient.current.url)
-    if uri.port == 80
+    if uri.port == uri.default_port
       uri.host
     else
       "#{uri.host}:#{uri.port}"
